@@ -1,7 +1,10 @@
-use std::env;
-
+use cat_rust::{Args, Cat};
+use clap::Parser;
+ 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args = Args::parse();
+    let mut cat = Cat::new();
 
-    println!("{:?}", args);
+    cat.parse_file(args.files[0].clone());
+    cat.run();
 }
