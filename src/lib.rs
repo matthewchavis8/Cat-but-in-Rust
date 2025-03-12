@@ -1,72 +1,64 @@
-use clap::{ Parser };
+use clap::Parser;
 use std::fs;
-use std::io::Write;
-use tempfile;
 
-#[derive(Parser, Debug)]
-pub struct Args {
-    //Takes in multiple input strings
-    pub files: Vec<String>,
-}
-
+#[derive(PartialEq, Debug)]
 pub struct Cat {
-    pub content: Vec<String>,
-    pub line_count: u8,
-    pub write_mode: bool,
+    pub file_content: Vec<String>,
+    pub parsed_content: Vec<String>,
+    pub output: String,
+    pub line_count: u16,
+
     pub line_number_mode: bool,
+    pub write_mode: bool,
+    pub redirection_mode: bool,
+    pub reversed_parse_mode: bool,
+    pub mark_end_of_line_mode: bool,
+    pub ignore_blank_line_mode: bool,
 }
 
 impl Cat {
- /****************************************************************************
- * function    : parseArg 
- * description : takes in a file and convert it into a string. Then we add it to our vector
- * argument(s) : 
- *    - path to the file
- * return void     : 
- ****************************************************************************/
-    pub fn parse_file(&mut self, path: String) {
-        let file = fs::read_to_string(path)
-        .expect("error parsing file");
-        self.content.push(file);
-    }
+    pub fn new() -> Cat {
+        Cat {
+            file_content: Vec::new(),
+            parsed_content: Vec::new(),
+            output: String::new(),
+            line_count: 0,
 
-    pub fn run(&mut self) {
-        for text in self.content.iter() {
-            println!("{}", text);
-        }
-    }
-    pub fn new() -> Self {
-        Self {
-            content: Vec::new(),
-            line_count: 1,
-            write_mode: false,
             line_number_mode: false,
+            write_mode: false,
+            redirection_mode: false,
+            reversed_parse_mode: false,
+            mark_end_of_line_mode: false,
+            ignore_blank_line_mode: false,
         }
     }
-
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // Test if file parsing is working correctly
-    #[test]
-    fn test_parse_file() {
-        //Creating a temporary file
-        let mut tmp_file = tempfile::NamedTempFile::new()
-        .expect("Failed to create temp file");
-
-        write!(tmp_file, "hello world").expect("Failed to write content to file");
-
-        let mut cat = Cat::new();
-
-        let file_path = tmp_file.path().to_str().unwrap();
-
-        cat.parse_file(file_path.to_string());
+    pub fn parse_file(&mut self, file_path: &str) -> String {
+        let content = fs::read_to_string(file_path)
+            .expect("Error parsing file");
         
-        assert_eq!(cat.content, vec!["hello world"]);
+        let parsed_content = if self.line_number_mode {
+            content
+                .lines()
+                .map(|line| {
+                    self.line_count += 1;
+                    format!("{}: {}", self.line_count, line)
+                })
+                .collect::<Vec<String>>()
+                .join("\n")
+        } else if self.mark_end_of_line_mode {
+            content
+                .lines()
+                .map(|line| {
+                    format!("{} $.", line)
+                })
+                .collect::<Vec<String>>()
+                .join("\n")
+        } else {
+            content
+        };
+
+        let res = parsed_content;
+        self.parsed_content.push(res.clone());
+        res
     }
-   
 }
