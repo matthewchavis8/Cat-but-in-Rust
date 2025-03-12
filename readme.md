@@ -13,7 +13,7 @@ Recreating the `cat` command in **Linux** but with I was too lazy so I just copy
 - ❌ **Ignore blank lines** with the `-s` flag.
 - 🙏 **Display help text** with `--help` flag.
 - ௷ Use `>` to redirect the following files into one file
-- 🛠️ Built with **C++**, **CMake**, and **GoogleTest**.
+- 🛠️ Built with **Rust**.
 
 ---
 
