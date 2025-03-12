@@ -1,4 +1,4 @@
-use clap::Parser;
+
 use std::fs;
 
 #[derive(PartialEq, Debug)]
@@ -60,5 +60,13 @@ impl Cat {
         let res = parsed_content;
         self.parsed_content.push(res.clone());
         res
+    }
+
+    pub fn result(mut self) -> String {
+        for content in self.parsed_content {
+            self.output.push_str(&content);
+            self.output.push('\n');
+        }
+        self.output
     }
 }

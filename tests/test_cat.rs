@@ -32,8 +32,16 @@ mod tests {
 
         let res = cat.parse_file(file_path);
 
-        println!("{}", res);
-
         assert_eq!(res, "Hello world");
+    }
+
+    #[test]
+    fn test_results() {
+        let mut cat = Cat::new();
+        let file_path = "test.txt";
+        cat.parse_file(file_path);
+
+        assert_eq!(cat.result(), "Hello world\n");
+
     }
 }
