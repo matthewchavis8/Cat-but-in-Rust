@@ -1,5 +1,6 @@
 
 use std::fs;
+use std::io::Write;
 
 #[derive(PartialEq, Debug)]
 pub struct Cat {
@@ -59,14 +60,42 @@ impl Cat {
 
         let res = parsed_content;
         self.parsed_content.push(res.clone());
+        self.output.push_str(&res);
         res
     }
 
-    pub fn result(mut self) -> String {
-        for content in self.parsed_content {
-            self.output.push_str(&content);
-            self.output.push('\n');
+    pub fn redirection(&mut self) {
+        if let Some(pos) = self.file_content.iter().position(|it| it == ">") {
+            let files_to_redirect = self.file_content[..pos].to_vec().clone();
+            let target_path = self.file_content[pos + 1].clone();
+
+            for file_path in files_to_redirect {
+                self.parse_file(file_path.as_str());
+            }
+            
+            let mut file = fs::OpenOptions::new()
+                .write(true)
+                .append(true)
+                .open(target_path)
+                .expect("Could not open file");
+
+            write!(file, "{}", self.output)
+                .expect("Could not write to the file")
+
         }
-        self.output
     }
-}
+
+    pub fn result(self) -> String {
+        if !self.parsed_content.is_empty() {
+            if self.reversed_parse_mode {
+                let mut rev = self.parsed_content.clone();
+                rev.reverse();
+                rev.join("\n\n")
+            } else {
+                self.parsed_content.join("\n\n")
+            }
+        } else {
+            panic!("parsed Content was empty")
+        }
+    }
+} 

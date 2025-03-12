@@ -2,6 +2,10 @@ use cat_rust::Cat;
 
 #[cfg(test)]
 mod tests {
+    use std::fs::{self, File};
+    use std::io::Write;
+    use tempfile::tempdir;
+
     use super::*;
 
     #[test]
@@ -41,7 +45,36 @@ mod tests {
         let file_path = "test.txt";
         cat.parse_file(file_path);
 
-        assert_eq!(cat.result(), "Hello world\n");
+        assert_eq!(cat.result(), "Hello world");
 
+    }
+
+    #[test]
+    fn test_redirect_to_file() {
+        let dir = tempdir().unwrap();
+        let file_path1 = dir.path().join("test1.txt");
+        let file_path2 = dir.path().join("test2.txt");
+        let file_path3 = dir.path().join("test3.txt");
+
+        let mut file1 = File::create(&file_path1).unwrap();
+        writeln!(file1, "Hello").unwrap();
+
+        let mut file2 = File::create(&file_path2).unwrap();
+        writeln!(file2, "World").unwrap();
+
+        let mut file3 = File::create(&file_path3).unwrap();
+
+        let mut cat = Cat::new();
+        cat.file_content = vec![
+            file_path1.to_str().unwrap().to_string(),
+            file_path2.to_str().unwrap().to_string(),
+            ">".to_string(),
+            file_path3.to_str().unwrap().to_string(), 
+        ];
+        cat.redirection();
+
+        let res = fs::read_to_string(&file_path3).unwrap();
+
+        assert_eq!(res, "Hello\nWorld\n");
     }
 }
