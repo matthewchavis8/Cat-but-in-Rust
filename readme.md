@@ -30,12 +30,12 @@ cd Cat-but-in-rust
 
 ## How to use
 ```sh
-cargo run -- "[-any flags]" files
+cargo run -- [-any flags] files
 ```
 ---
 
 #### Redirect files
 ```sh
-cargo run -- "[-any flags]" files > file_you_want_to_redirect_into
+cargo run -- [-any flags] files > file_you_want_to_redirect_into
 ```
 ---
