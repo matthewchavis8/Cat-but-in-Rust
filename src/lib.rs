@@ -54,6 +54,13 @@ impl Cat {
                 })
                 .collect::<Vec<String>>()
                 .join("\n")
+        } else if self.ignore_blank_line_mode {
+            content
+                .lines()
+                .filter(|line| !line.is_empty())
+                .map(|line| format!("{}", line))
+                .collect::<Vec<String>>()
+                .join("\n")
         } else {
             content
         };

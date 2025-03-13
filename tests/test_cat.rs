@@ -36,7 +36,7 @@ mod tests {
 
         let res = cat.parse_file(file_path);
 
-        assert_eq!(res, "Hello world");
+        assert_eq!(res, "Hello world\n");
     }
 
     #[test]
@@ -45,7 +45,7 @@ mod tests {
         let file_path = "test.txt";
         cat.parse_file(file_path);
 
-        assert_eq!(cat.result(), "Hello world");
+        assert_eq!(cat.result(), "Hello world\n");
 
     }
 
@@ -62,7 +62,7 @@ mod tests {
         let mut file2 = File::create(&file_path2).unwrap();
         writeln!(file2, "World").unwrap();
 
-        let mut file3 = File::create(&file_path3).unwrap();
+        let _file3 = File::create(&file_path3).unwrap();
 
         let mut cat = Cat::new();
         cat.file_content = vec![
@@ -76,5 +76,17 @@ mod tests {
         let res = fs::read_to_string(&file_path3).unwrap();
 
         assert_eq!(res, "Hello\nWorld\n");
+    }
+
+    #[test]
+    fn test_parse_without_blank_lines() {
+        let mut cat = Cat::new();
+        cat.ignore_blank_line_mode = true; 
+
+        let file_path = "test.txt";
+
+        let res = cat.parse_file(file_path);
+
+        assert_eq!(res, "Hello world");
     }
 }
